@@ -104,7 +104,7 @@
     
     [[self openGLContext] makeCurrentContext];
     
-    NSRect frame = [self frame];
+    NSRect frame = [self convertRectToBacking:[self frame]];
     NSRect bounds = [self bounds];
     
     GLfloat minX = NSMinX(bounds);
@@ -130,13 +130,15 @@
 
     if (shoeApp->isRunning) {
         shoebill_video_frame_info_t frame = shoebill_get_video_frame(slotnum, 0);
+        NSSize scale = NSMakeSize(1, 1);
+        scale = [self convertSizeToBacking:scale];
         
-        glViewport(0, 0, frame.width, frame.height);
+        glViewport(0, 0, frame.width * scale.width, frame.height * scale.width);
         glRasterPos2i(0, frame.height);
         glPixelStorei(GL_UNPACK_LSB_FIRST, GL_TRUE);
         glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
         
-        glPixelZoom(1.0, -1.0);
+        glPixelZoom(1.0 * scale.width, -1.0 * scale.width);
         
         glDrawPixels(frame.width,
                      frame.height,
